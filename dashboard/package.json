@@ -1,0 +1,30 @@
+{
+  "name": "arivage-stock-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"node --env-file-if-exists=.env --watch server/index.js\" \"vite\"",
+    "build": "vite build",
+    "start": "node --env-file-if-exists=.env server/index.js",
+    "test": "node --test \"server/*.test.js\"",
+    "set-password": "node --env-file-if-exists=.env server/set-password.js",
+    "set-email": "node --env-file-if-exists=.env server/set-email.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "google-auth-library": "^11.3.3",
+    "helmet": "^8.0.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vite": "^6.0.7"
+  },
+  "engines": {
+    "node": ">=22.9"
+  }
+}

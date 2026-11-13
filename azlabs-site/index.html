@@ -1,0 +1,559 @@
+<title>AZLabs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="AZLabs — nutrition et training. Compléments sélectionnés et programmes d'entraînement mesurés.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap">
+<style>
+/* Layout: AZLabs brand (brand.json): paper ground, royal blue + cyan, chunky playful display type, frosted-glass cards, five hash-routed pages. Light-only brand by choice. */
+:root {
+  --sky: #F8FAFB;        /* paper */
+  --sky-deep: #CFDDFB;   /* gradients */
+  --navy: #0A1F4D;       /* ink: text, buttons, wordmark */
+  --slate: #4A5878;      /* secondary text */
+  --lab: #2450E6;        /* primary, Nutrition */
+  --lab-ink: #1E44CC;    /* small blue text */
+  --lab-soft: #DCE5FC;
+  --force: #00D9FF;      /* accent, Training: fills only, never text on light */
+  --force-ink: #00708A;  /* small cyan text on light (AA) */
+  --force-soft: #D2F7FF;
+  --glass: rgba(255, 255, 255, .62);
+  --glass-strong: rgba(255, 255, 255, .86);
+  --edge: rgba(255, 255, 255, .95);
+  --hair: rgba(10, 31, 77, .08);
+  --white: #FFFFFF;
+  --mint: #00D9FF;
+  --shadow: 0 14px 36px rgba(36, 80, 230, .12);
+  --font: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display: 'Baloo 2', var(--font); /* echoes the rounded, bouncy wordmark */
+  --r: 28px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; font-family: var(--font); color: var(--navy); font-size: 17px; line-height: 1.55;
+  background: var(--sky) linear-gradient(160deg, #FFFFFF 0%, #EEF3FE 55%, var(--sky-deep) 100%) fixed;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--sky); }
+h1, h2, h3 { margin: 0; text-wrap: balance; line-height: 1.05; font-family: var(--display); }
+.az-mark, .az-word { display: block; fill: currentColor; }
+p { margin: 0; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--lab); outline-offset: 3px; border-radius: 8px; }
+.wrap { max-width: 1200px; margin: 0 auto; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* Ambient light */
+.blob { position: fixed; border-radius: 50%; pointer-events: none; z-index: -1; animation: drift 16s ease-in-out infinite alternate; }
+.blob.one { width: 640px; height: 640px; right: -180px; top: -200px; background: radial-gradient(circle, rgba(0, 217, 255, .55), transparent 65%); }
+.blob.two { width: 720px; height: 720px; left: -260px; bottom: -300px; background: radial-gradient(circle, rgba(255, 255, 255, .9), transparent 65%); animation-delay: -6s; }
+@keyframes drift { to { transform: translate(-40px, 30px) scale(1.06); } }
+
+/* Glass */
+.glass { background: var(--glass); border: 1px solid var(--edge); border-radius: var(--r); box-shadow: var(--shadow); backdrop-filter: blur(14px) saturate(160%); -webkit-backdrop-filter: blur(14px) saturate(160%); }
+
+/* Header */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; padding-block: 14px; }
+.bar { display: flex; align-items: center; gap: 16px; padding: 10px 12px 10px 18px; border-radius: 999px; background: var(--glass-strong); }
+.brand { display: flex; align-items: center; gap: 8px; text-decoration: none; color: var(--navy); }
+.brand .az-mark { width: 32px; height: 36px; fill: url(#az-grad); }
+.brand .az-word { width: 96px; height: 27px; }
+nav.links { display: flex; gap: 4px; margin: 0 auto; }
+nav.links a { position: relative; padding: 9px 16px; border-radius: 999px; text-decoration: none; color: var(--slate); font-weight: 500; transition: color .2s, background .2s; }
+nav.links a:hover { color: var(--navy); background: rgba(255, 255, 255, .7); }
+nav.links a[aria-current="page"] { color: var(--white); background: var(--navy); }
+.menu-btn { display: none; margin-left: auto; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--navy); color: var(--white); cursor: pointer; font-size: 1.1rem; }
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 24px; border-radius: 999px; border: 0; cursor: pointer; text-decoration: none; font-weight: 600; transition: transform .2s, box-shadow .2s, background .2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0) scale(.97); }
+.btn.dark { background: var(--navy); color: var(--white); box-shadow: 0 10px 24px rgba(10, 31, 77, .22); }
+.btn.dark:hover { box-shadow: 0 14px 30px rgba(10, 31, 77, .3); }
+.btn.light { background: var(--glass-strong); color: var(--navy); border: 1px solid var(--edge); }
+.btn.lab { background: var(--lab); color: var(--white); }
+.btn.force { background: var(--force); color: var(--navy); }
+.bar .btn { padding: 11px 20px; }
+
+/* Pages */
+main { padding-block: 24px 40px; }
+.page { display: none; flex-direction: column; gap: 96px; }
+.page.on { display: flex; }
+.page.on .rise { animation: rise .8s cubic-bezier(.16, 1, .3, 1) both; }
+.page.on .rise:nth-child(2) { animation-delay: .08s; }
+.page.on .rise:nth-child(3) { animation-delay: .16s; }
+.page.on .rise:nth-child(4) { animation-delay: .24s; }
+@keyframes rise { from { transform: translateY(26px); opacity: .001; } }
+.eyebrow { font-size: .82rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--lab-ink); }
+.eyebrow.green { color: var(--force-ink); }
+.section-head { display: grid; gap: 14px; max-width: 760px; }
+.section-head h2 { font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 800; letter-spacing: -.02em; }
+.section-head h1 { font-size: clamp(2.8rem, 7vw, 5rem); font-weight: 800; letter-spacing: -.03em; }
+.section-head p { color: var(--slate); font-size: 1.12rem; max-width: 60ch; }
+.block { display: grid; gap: 36px; }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center; padding-top: 24px; }
+.hero h1 { font-size: clamp(3rem, 8vw, 6.4rem); font-weight: 800; letter-spacing: -.035em; line-height: .95; }
+.hero h1 em { font-style: normal; color: var(--accent, var(--lab)); transition: color .4s; }
+.hero-copy { display: grid; gap: 26px; min-width: 0; }
+.hero-copy > p { font-size: 1.2rem; color: var(--slate); max-width: 52ch; }
+.hero-controls { display: grid; gap: 16px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.switch { display: inline-flex; padding: 5px; border-radius: 999px; background: var(--glass-strong); border: 1px solid var(--edge); width: fit-content; }
+.switch button { border: 0; background: none; padding: 10px 22px; border-radius: 999px; font-weight: 600; color: var(--slate); cursor: pointer; transition: background .3s, color .3s; }
+.switch button[aria-pressed="true"] { color: var(--white); }
+.hero[data-mode="nut"] .switch [data-mode="nut"] { background: var(--lab); }
+.hero[data-mode="train"] .switch [data-mode="train"] { background: var(--force); color: var(--navy); }
+.hero[data-mode="train"] { --accent: var(--force-ink); }
+.mode-note { color: var(--slate); min-height: 3.2em; }
+.orb { position: relative; aspect-ratio: 1; width: 100%; max-width: 440px; justify-self: center; border-radius: 50%; display: grid; place-items: center; background: var(--glass); border: 1px solid var(--edge); animation: breath 4s ease-in-out infinite; }
+.orb .az-mark { width: 52%; height: auto; aspect-ratio: 1925 / 2140; transition: fill .4s; animation: bob 3.2s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-8px) rotate(-3deg); } }
+@keyframes breath { 0%, 100% { box-shadow: 0 24px 60px rgba(36, 80, 230, .14); } 50% { box-shadow: 0 30px 90px rgba(36, 80, 230, .3); } }
+.hero[data-mode="train"] .orb { animation-name: breath-g; }
+@keyframes breath-g { 0%, 100% { box-shadow: 0 24px 60px rgba(0, 217, 255, .14); } 50% { box-shadow: 0 30px 90px rgba(0, 217, 255, .3); } }
+.orb .tag { position: absolute; padding: 10px 16px; border-radius: 999px; background: var(--glass-strong); border: 1px solid var(--edge); font-weight: 600; font-size: .9rem; box-shadow: var(--shadow); white-space: nowrap; }
+.orb .tag b { color: var(--lab-ink); }
+.orb .tag.g b { color: var(--force-ink); }
+.orb .t1 { top: 12%; left: -6%; }
+.orb .t2 { bottom: 14%; right: -8%; }
+
+/* Marquee */
+.marquee { overflow: hidden; border-radius: 999px; background: var(--navy); color: var(--white); padding-block: 14px; }
+.marquee div { display: flex; gap: 40px; width: max-content; animation: slide 28s linear infinite; font-weight: 600; letter-spacing: .2em; font-size: .9rem; }
+.marquee span::after { content: "●"; margin-left: 40px; color: #00D9FF; }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* Two poles */
+.poles { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.pole { padding: 40px; display: grid; gap: 22px; align-content: start; transition: transform .3s; }
+.pole:hover { transform: translateY(-6px); }
+.pole-top { display: flex; align-items: center; gap: 24px; }
+.pole-icon { width: 120px; height: 120px; flex: none; border-radius: 30px; display: grid; place-items: center; }
+.pole-icon .az-mark { width: 64px; height: 71px; }
+.pole h3 { font-size: clamp(2.2rem, 4vw, 3.2rem); font-weight: 800; }
+.pole.nut h3 { color: var(--lab); }
+.pole.train h3 { color: var(--force-ink); }
+.pole p { color: var(--slate); }
+.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ticks li { display: flex; gap: 12px; align-items: baseline; }
+.ticks li::before { content: ""; width: 9px; height: 9px; flex: none; border-radius: 3px; background: var(--lab); transform: translateY(-1px); }
+.train .ticks li::before { background: var(--force); }
+.fit { width: fit-content; }
+
+/* Protocol: a real sequence, so numbered */
+.steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }
+.step { padding: 32px; display: grid; gap: 12px; align-content: start; }
+.step::before { counter-increment: step; content: counter(step, decimal-leading-zero); font-family: var(--display); font-size: 3.4rem; font-weight: 800; color: var(--lab); line-height: 1; }
+.step h3 { font-size: 1.6rem; font-weight: 700; }
+.step p { color: var(--slate); }
+
+/* Product grid */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button { border: 1px solid var(--edge); background: var(--glass); padding: 9px 18px; border-radius: 999px; cursor: pointer; font-weight: 500; color: var(--slate); transition: background .2s, color .2s; }
+.filters button[aria-pressed="true"] { background: var(--lab); color: var(--white); border-color: var(--lab); }
+.products { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+.product { padding: 24px; display: grid; gap: 14px; align-content: start; transition: transform .3s, box-shadow .3s; }
+.product:hover { transform: translateY(-5px); box-shadow: 0 22px 44px rgba(36, 80, 230, .2); }
+.product .vial { height: 120px; border-radius: 20px; background: var(--lab-soft); display: grid; place-items: center; }
+.product .vial .az-mark { height: 76px; width: 68px; color: var(--lab); }
+.product .kind { font-size: .76rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--lab-ink); }
+.product h3 { font-size: 1.3rem; font-weight: 700; line-height: 1.2; }
+.product p { color: var(--slate); font-size: .95rem; }
+.spec { display: flex; flex-wrap: wrap; gap: 6px; }
+.spec span { font-size: .8rem; padding: 4px 10px; border-radius: 999px; background: var(--glass-strong); color: var(--navy); }
+.product .foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 12px; border-top: 1px solid var(--hair); }
+.product .price { font-weight: 700; }
+.product .ask { background: var(--navy); color: var(--white); border-radius: 999px; padding: 8px 16px; font-weight: 600; text-decoration: none; transition: background .2s; }
+.product .ask:hover { background: var(--lab); }
+
+/* Programs */
+.programs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.program { padding: 30px; display: grid; gap: 16px; align-content: start; transition: transform .3s; }
+.program:hover { transform: translateY(-5px); }
+.program .letter { font-size: .8rem; font-weight: 600; letter-spacing: .2em; color: var(--force-ink); }
+.program h3 { font-size: 2rem; font-weight: 800; }
+.program p { color: var(--slate); }
+.scheme { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; padding: 16px; border-radius: 18px; background: var(--force-soft); font-size: .95rem; }
+.scheme dt { color: var(--force-ink); font-weight: 600; }
+.scheme dd { margin: 0; }
+
+/* 1RM calculator: the page's live tool */
+.calc { display: grid; grid-template-columns: 1fr 1.2fr; overflow: hidden; }
+.calc-in { padding: 36px; display: grid; gap: 20px; align-content: start; }
+.calc-out { padding: 36px; background: var(--navy); color: var(--white); display: grid; gap: 18px; align-content: start; }
+.field { display: grid; gap: 8px; font-weight: 500; color: var(--slate); }
+.field input, .field select, .field textarea { width: 100%; padding: 13px 16px; border-radius: 16px; border: 1px solid rgba(10, 31, 77, .12); background: rgba(255, 255, 255, .8); color: var(--navy); outline: none; transition: border-color .2s, box-shadow .2s; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--lab); box-shadow: 0 0 0 4px rgba(36, 80, 230, .15); }
+.big { font-family: var(--display); font-size: clamp(3.4rem, 8vw, 5.2rem); font-weight: 800; line-height: 1; color: var(--mint); }
+.big small { font-size: .35em; font-weight: 500; color: rgba(255, 255, 255, .7); }
+.zones { display: grid; gap: 10px; }
+.zone { display: grid; grid-template-columns: 120px 1fr 80px; gap: 12px; align-items: center; font-size: .95rem; }
+.zone .track { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, .12); overflow: hidden; }
+.zone .fill { display: block; height: 100%; border-radius: 999px; background: var(--mint); transition: width .5s cubic-bezier(.16, 1, .3, 1); }
+.zone b { text-align: right; }
+.note { font-size: .85rem; color: rgba(255, 255, 255, .65); }
+
+/* Values */
+.values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.value { padding: 30px; display: grid; gap: 10px; }
+.value .chip { width: 56px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-weight: 800; }
+.value h3 { font-size: 1.4rem; font-weight: 700; }
+.value p { color: var(--slate); }
+
+/* Contact */
+.contact { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+.contact form { padding: 36px; display: grid; gap: 16px; }
+.contact .info { padding: 36px; display: grid; gap: 22px; }
+.line { display: grid; gap: 4px; }
+.line span { font-size: .8rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--slate); }
+.line b { font-size: 1.25rem; user-select: all; }
+.status { min-height: 1.5em; color: var(--force-ink); font-weight: 500; }
+
+/* CTA band + footer */
+.cta { padding: 56px; text-align: center; display: grid; gap: 22px; justify-items: center; background: var(--navy); color: var(--white); border-radius: 36px; }
+.cta h2 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800; }
+.cta p { color: rgba(255, 255, 255, .75); max-width: 56ch; }
+.cta .btn.light { background: var(--white); }
+footer { padding-block: 40px 56px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; color: var(--slate); }
+footer .brand { color: var(--navy); }
+
+@media (max-width: 920px) {
+  .hero, .poles, .contact, .calc { grid-template-columns: 1fr; }
+  .steps, .programs, .values { grid-template-columns: 1fr; }
+  .orb { max-width: 340px; }
+  .bar { position: relative; }
+  nav.links { display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0; flex-direction: column; padding: 10px; border-radius: 24px; background: var(--glass-strong); border: 1px solid var(--edge); box-shadow: var(--shadow); backdrop-filter: blur(14px); }
+  nav.links.open { display: flex; }
+  .bar > .btn { display: none; }
+  .menu-btn { display: grid; place-items: center; }
+  .page { gap: 64px; }
+  .pole, .step, .program, .calc-in, .calc-out, .contact form, .contact .info { padding: 24px; }
+  .cta { padding: 36px 22px; }
+}
+@media (max-width: 480px) {
+  .pole-top { flex-direction: column; align-items: flex-start; }
+  .orb .t1 { left: 0; } .orb .t2 { right: 0; }
+  .zone { grid-template-columns: 100px 1fr 70px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+
+<!-- Logo sprite, from brand.json (Recraft master SVG): mark + wordmark, single colour via currentColor -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><linearGradient id="az-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2450E6"/><stop offset=".5" stop-color="#008FD4"/><stop offset="1" stop-color="#00BCDD"/></linearGradient></defs>
+  <symbol id="az-mark" viewBox="1210 500 1925 2140"><path fill-rule="evenodd" d="M 2253 518 C 2280 517 2308 518 2336 519 C 2358 519 2379 520 2401 522 C 2466 526 2544 529 2602 558 C 2625 569 2647 588 2662 609 C 2679 633 2684 659 2683 688 C 2681 747 2637 780 2587 800 C 2572 806 2558 811 2544 817 C 2490 840 2489 868 2488 922 C 2488 992 2490 1039 2498 1109 C 2512 1236 2559 1359 2623 1469 C 2642 1501 2662 1533 2683 1564 C 2683 1564 2685 1568 2685 1568 C 2719 1618 2754 1667 2788 1717 C 2818 1761 2849 1804 2878 1848 C 2878 1848 2881 1852 2881 1852 C 2892 1868 2902 1884 2913 1900 C 2924 1919 2937 1938 2948 1956 C 2948 1956 2950 1959 2950 1959 C 2971 1992 2992 2025 3012 2059 C 3024 2080 3036 2102 3047 2124 C 3060 2148 3073 2175 3083 2200 C 3106 2256 3121 2308 3118 2369 C 3111 2506 2983 2576 2863 2602 C 2817 2612 2771 2617 2725 2619 C 2652 2623 2575 2619 2504 2614 C 2466 2611 2429 2608 2391 2605 C 2357 2602 2323 2601 2289 2599 C 2273 2598 2258 2597 2242 2597 C 2210 2597 2178 2596 2146 2598 C 2134 2598 2123 2600 2112 2600 C 2091 2601 2071 2602 2052 2604 C 1997 2608 1943 2613 1889 2617 C 1889 2617 1881 2617 1881 2617 C 1864 2618 1846 2619 1829 2619 C 1829 2619 1822 2620 1822 2620 C 1794 2620 1767 2621 1740 2621 C 1698 2621 1656 2620 1614 2617 C 1611 2617 1608 2617 1605 2616 C 1516 2607 1439 2596 1357 2551 C 1330 2537 1303 2516 1282 2493 C 1198 2395 1226 2265 1276 2159 C 1333 2040 1420 1932 1499 1827 C 1499 1827 1502 1822 1502 1822 C 1554 1756 1607 1690 1658 1623 C 1658 1623 1661 1620 1661 1620 C 1706 1558 1751 1495 1790 1428 C 1809 1397 1825 1364 1840 1329 C 1872 1254 1886 1194 1891 1115 C 1893 1089 1893 1064 1893 1039 C 1893 1005 1893 968 1890 934 C 1886 880 1881 853 1827 832 C 1809 825 1791 820 1772 814 C 1740 801 1710 785 1689 756 C 1661 716 1659 658 1687 618 C 1730 558 1824 548 1890 540 C 1890 540 1893 539 1894 539 C 1937 534 1980 529 2023 526 C 2067 523 2120 521 2163 519 C 2192 518 2223 518 2253 518 z M 2578 1757 C 2626 1757 2667 1777 2696 1817 C 2721 1852 2729 1885 2732 1928 C 2736 1978 2727 2031 2711 2080 C 2702 2106 2689 2138 2676 2162 C 2633 2242 2579 2305 2505 2356 C 2480 2373 2460 2385 2433 2397 C 2347 2438 2261 2454 2167 2454 C 2143 2454 2119 2454 2096 2451 C 2034 2444 1972 2430 1914 2406 C 1845 2377 1788 2340 1734 2288 C 1691 2246 1646 2183 1625 2126 C 1598 2052 1595 1983 1630 1912 C 1654 1862 1703 1818 1757 1802 C 1820 1783 1878 1794 1939 1818 C 1975 1833 2010 1850 2047 1862 C 2156 1899 2240 1878 2342 1834 C 2415 1802 2496 1757 2578 1757 z M 2586 1893 C 2597 1893 2607 1895 2616 1901 C 2666 1932 2630 2013 2609 2050 C 2598 2067 2588 2084 2577 2101 C 2542 2150 2497 2197 2449 2234 C 2362 2301 2265 2339 2155 2339 C 2128 2339 2101 2336 2075 2332 C 1969 2315 1853 2251 1787 2165 C 1770 2144 1750 2112 1753 2084 C 1760 2025 1822 2024 1867 2034 C 1901 2040 1934 2049 1968 2055 C 1992 2060 2017 2063 2043 2065 C 2123 2072 2209 2059 2284 2031 C 2307 2022 2330 2013 2352 2003 C 2374 1992 2397 1981 2419 1969 C 2449 1952 2478 1935 2508 1919 C 2532 1906 2558 1894 2586 1893 z M 2078 1486 C 2144 1487 2196 1541 2195 1606 C 2194 1671 2141 1723 2076 1723 C 2010 1722 1957 1669 1958 1603 C 1959 1537 2013 1485 2078 1486 z M 2222 1205 C 2268 1206 2305 1244 2304 1290 C 2303 1336 2265 1372 2220 1372 C 2173 1371 2137 1333 2138 1287 C 2138 1241 2176 1204 2222 1205 z"/></symbol>
+  <symbol id="az-word" viewBox="230 2650 3925 1112"><path fill-rule="evenodd" d="M 898 2692 C 937 2692 979 2701 1009 2729 C 1040 2757 1048 2791 1056 2830 C 1059 2841 1061 2852 1062 2863 C 1066 2896 1069 2928 1070 2961 C 1072 3012 1072 3063 1070 3115 C 1069 3143 1067 3172 1065 3201 C 1064 3214 1063 3228 1062 3242 C 1062 3242 1062 3247 1062 3247 C 1054 3326 1047 3417 1030 3496 C 1017 3555 1005 3618 970 3669 C 936 3719 885 3749 824 3749 C 795 3749 765 3744 742 3726 C 687 3684 689 3606 705 3546 C 711 3528 724 3491 727 3472 C 730 3458 722 3441 707 3437 C 669 3429 633 3472 616 3500 C 616 3500 615 3501 615 3501 C 595 3535 578 3570 554 3600 C 511 3656 463 3696 390 3696 C 353 3696 314 3683 289 3656 C 224 3590 239 3481 262 3400 C 270 3374 278 3347 288 3322 C 301 3288 315 3254 330 3221 C 349 3181 368 3141 390 3103 C 402 3083 412 3063 425 3044 C 434 3029 444 3014 454 2999 C 454 2999 456 2997 456 2997 C 502 2931 554 2868 615 2815 C 692 2748 792 2692 898 2692 z M 791 2961 C 769 2961 730 2998 716 3014 C 690 3044 670 3073 650 3107 C 624 3152 602 3200 591 3251 C 588 3266 582 3298 603 3304 C 605 3305 607 3305 610 3305 C 648 3305 704 3239 725 3210 C 760 3162 790 3104 805 3046 C 810 3028 820 2982 804 2967 C 800 2964 795 2961 791 2961 Z M 3112 3738 C 3038 3726 2970 3678 2943 3608 C 2923 3554 2928 3487 2940 3433 C 2950 3387 2963 3342 2973 3297 C 2976 3282 2979 3268 2982 3254 C 2986 3231 2988 3208 2990 3185 C 2995 3133 2991 3082 2982 3031 C 2969 2947 2949 2885 2965 2804 C 2977 2740 3018 2678 3085 2663 C 3119 2656 3160 2659 3190 2681 C 3234 2714 3246 2771 3250 2824 C 3251 2842 3252 2860 3252 2879 C 3251 2904 3250 2929 3247 2953 C 3243 2985 3238 3017 3234 3050 C 3233 3056 3233 3063 3233 3069 C 3238 3067 3244 3065 3249 3062 C 3258 3057 3268 3050 3278 3045 C 3302 3031 3331 3020 3359 3016 C 3408 3010 3451 3018 3490 3049 C 3547 3093 3574 3167 3581 3237 C 3584 3259 3585 3282 3584 3305 C 3581 3366 3568 3420 3543 3476 C 3528 3511 3507 3542 3483 3572 C 3421 3651 3329 3716 3231 3737 C 3192 3744 3151 3745 3112 3738 z M 3313 3253 C 3291 3253 3261 3285 3248 3300 C 3219 3335 3198 3376 3183 3419 C 3179 3434 3159 3501 3189 3505 C 3189 3505 3190 3505 3191 3505 C 3226 3505 3276 3435 3292 3408 C 3312 3374 3340 3311 3332 3271 C 3330 3262 3323 3253 3313 3253 Z M 1591 2721 C 1648 2721 1711 2728 1763 2755 C 1806 2779 1830 2809 1842 2857 C 1849 2883 1846 2908 1841 2934 C 1822 3021 1730 3103 1666 3156 C 1666 3156 1661 3161 1661 3161 C 1655 3165 1649 3170 1643 3174 C 1592 3217 1537 3255 1485 3297 C 1472 3308 1453 3324 1456 3343 C 1461 3369 1498 3363 1516 3360 C 1564 3353 1613 3340 1661 3349 C 1701 3356 1737 3381 1745 3424 C 1750 3454 1744 3483 1728 3509 C 1696 3560 1619 3597 1565 3618 C 1484 3650 1399 3679 1312 3679 C 1291 3679 1272 3677 1252 3674 C 1173 3659 1112 3609 1088 3533 C 1065 3463 1064 3384 1098 3318 C 1128 3259 1188 3219 1242 3183 C 1293 3150 1345 3119 1395 3086 C 1414 3074 1433 3062 1448 3045 C 1463 3030 1470 3007 1450 2993 C 1430 2979 1370 2998 1349 3004 C 1307 3015 1258 3024 1215 3013 C 1175 3002 1146 2969 1145 2927 C 1144 2870 1186 2828 1234 2803 C 1306 2766 1414 2738 1495 2728 C 1526 2724 1558 2721 1591 2721 z M 2165 2711 C 2190 2711 2222 2719 2244 2734 C 2270 2751 2285 2776 2291 2806 C 2300 2848 2284 2893 2265 2930 C 2255 2950 2245 2970 2234 2989 C 2186 3072 2132 3152 2085 3236 C 2064 3275 2034 3333 2030 3379 C 2028 3401 2028 3422 2053 3428 C 2066 3431 2089 3417 2100 3410 C 2116 3401 2132 3390 2148 3381 C 2196 3355 2234 3345 2289 3350 C 2324 3353 2366 3375 2387 3404 C 2405 3429 2411 3452 2410 3483 C 2409 3533 2375 3574 2340 3606 C 2283 3657 2210 3701 2140 3728 C 2099 3744 2055 3752 2012 3752 C 1973 3752 1932 3743 1897 3725 C 1856 3702 1828 3671 1808 3629 C 1791 3594 1782 3552 1778 3514 C 1775 3476 1773 3438 1776 3401 C 1778 3365 1781 3329 1786 3294 C 1793 3250 1807 3189 1821 3144 C 1833 3108 1844 3072 1860 3038 C 1869 3017 1878 2997 1888 2977 C 1911 2931 1936 2887 1965 2846 C 1993 2807 2022 2773 2061 2746 C 2090 2725 2128 2711 2165 2711 z M 2734 2936 C 2768 2936 2800 2940 2832 2952 C 2861 2963 2884 2981 2902 3007 C 2925 3039 2933 3086 2933 3126 C 2933 3159 2929 3199 2923 3232 C 2907 3321 2887 3380 2892 3470 C 2894 3501 2899 3533 2897 3564 C 2893 3615 2865 3653 2811 3653 C 2797 3653 2784 3651 2772 3645 C 2737 3628 2719 3599 2709 3563 C 2707 3554 2703 3533 2699 3526 C 2695 3522 2683 3535 2681 3537 C 2654 3565 2630 3595 2596 3613 C 2558 3633 2509 3637 2470 3615 C 2441 3598 2429 3568 2433 3535 C 2435 3520 2438 3507 2440 3493 C 2444 3457 2436 3418 2414 3389 C 2392 3360 2369 3347 2336 3334 C 2294 3317 2279 3293 2283 3249 C 2290 3176 2363 3098 2417 3055 C 2508 2984 2616 2936 2734 2936 z M 2535 3326 C 2559 3331 2579 3321 2599 3308 C 2637 3282 2687 3222 2694 3175 C 2695 3165 2694 3154 2687 3148 C 2666 3130 2617 3162 2601 3175 C 2568 3202 2520 3259 2523 3306 C 2524 3315 2528 3320 2535 3326 Z M 3830 2930 C 3899 2930 3977 2946 4036 2986 C 4070 3010 4097 3055 4071 3095 C 4032 3156 3948 3145 3887 3146 C 3887 3146 3884 3146 3884 3146 C 3866 3147 3840 3155 3846 3179 C 3851 3200 3892 3215 3909 3221 C 3970 3245 4032 3264 4082 3309 C 4107 3332 4128 3363 4137 3396 C 4150 3444 4144 3492 4118 3535 C 4086 3587 4023 3626 3968 3650 C 3908 3677 3840 3691 3775 3691 C 3737 3691 3694 3686 3659 3673 C 3619 3657 3588 3634 3569 3594 C 3557 3567 3557 3529 3566 3501 C 3587 3443 3637 3416 3696 3411 C 3714 3410 3732 3410 3750 3409 C 3773 3407 3797 3397 3795 3369 C 3793 3352 3777 3338 3765 3327 C 3735 3300 3700 3277 3670 3250 C 3633 3218 3604 3185 3590 3138 C 3576 3094 3584 3041 3617 3007 C 3670 2950 3755 2931 3830 2930 z"/></symbol>
+</svg>
+
+<div class="blob one" aria-hidden="true"></div>
+<div class="blob two" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="wrap bar glass">
+    <a class="brand" href="#accueil" aria-label="AZLabs, accueil"><svg class="az-mark" aria-hidden="true"><use href="#az-mark"/></svg><svg class="az-word" aria-hidden="true"><use href="#az-word"/></svg></a>
+    <nav class="links" id="links" aria-label="Pages">
+      <a href="#accueil">Accueil</a>
+      <a href="#nutrition">Nutrition</a>
+      <a href="#training">Training</a>
+      <a href="#methode">Méthode</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="btn dark" href="#contact">Rejoindre le labo</a>
+    <button class="menu-btn" id="menu-btn" type="button" aria-expanded="false" aria-controls="links" aria-label="Ouvrir le menu">☰</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ACCUEIL -->
+  <section class="page" id="accueil" aria-label="Accueil">
+    <div class="hero" id="hero" data-mode="nut">
+      <div class="hero-copy">
+        <span class="eyebrow rise">AZLabs · Nutrition &amp; Training</span>
+        <h1 class="rise">La science de ta <em>performance</em>.</h1>
+        <p class="rise">Des compléments sélectionnés avec rigueur et des programmes d'entraînement mesurés. Un seul labo pour nourrir ta force.</p>
+        <div class="hero-controls rise">
+          <div class="switch" role="group" aria-label="Choisir un pôle">
+            <button type="button" data-mode="nut" aria-pressed="true">Nutrition</button>
+            <button type="button" data-mode="train" aria-pressed="false">Training</button>
+          </div>
+          <p class="mode-note" id="mode-note" aria-live="polite"></p>
+          <div class="actions">
+            <a class="btn dark" id="mode-cta" href="#nutrition">Explorer la nutrition</a>
+            <a class="btn light" href="#methode">Notre méthode</a>
+          </div>
+        </div>
+      </div>
+      <div class="orb" id="orb">
+        <span class="tag t1">Créatine <b>3–5 g / jour</b></span>
+        <span class="tag g t2">Force <b>5 × 5</b></span>
+      </div>
+    </div>
+
+    <div class="marquee" aria-hidden="true"><div><span>NUTRITION</span><span>TRAINING</span><span>SCIENCE</span><span>FORCE</span><span>PROGRESSION</span><span>RÉCUPÉRATION</span><span>NUTRITION</span><span>TRAINING</span><span>SCIENCE</span><span>FORCE</span><span>PROGRESSION</span><span>RÉCUPÉRATION</span></div></div>
+
+    <div class="block">
+      <div class="section-head"><span class="eyebrow">Nos pôles</span><h2>Un labo, deux pôles.</h2><p>Le symbole AZLabs, c'est une fiole qui sourit : la rigueur du labo pour la nutrition, l'énergie du sport pour l'entraînement.</p></div>
+      <div class="poles">
+        <article class="pole nut glass">
+          <div class="pole-top"><div class="pole-icon" style="background:var(--lab-soft);color:var(--lab)"><svg class="az-mark" aria-hidden="true"><use href="#az-mark"/></svg></div><div><span class="eyebrow">AZLabs</span><h3>Nutrition</h3></div></div>
+          <p>Des compléments choisis pour leur qualité et des plans alimentaires construits autour de ton objectif : prise de muscle, sèche ou performance.</p>
+          <ul class="ticks"><li>Créatine, magnésium, zinc, vitamines D3 + K2</li><li>Plans alimentaires selon ton objectif</li><li>Conseils de dosage selon ton entraînement</li></ul>
+          <a class="btn lab fit" href="#nutrition">Voir les produits</a>
+        </article>
+        <article class="pole train glass">
+          <div class="pole-top"><div class="pole-icon" style="background:var(--force);color:var(--navy)"><svg class="az-mark" aria-hidden="true"><use href="#az-mark"/></svg></div><div><span class="eyebrow green">AZLabs</span><h3>Training</h3></div></div>
+          <p>Des programmes structurés en force et en hypertrophie, avec un suivi de chaque séance pour voir ta progression noir sur blanc.</p>
+          <ul class="ticks"><li>Programmes force, hypertrophie et remise en forme</li><li>Suivi des charges et de la progression</li><li>Coaching et ajustements réguliers</li></ul>
+          <a class="btn force fit" href="#training">Voir les programmes</a>
+        </article>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="section-head"><span class="eyebrow">Le protocole</span><h2>Trois étapes, zéro hasard.</h2></div>
+      <div class="steps">
+        <div class="step glass"><h3>Analyse</h3><p>On part de ton objectif, de ton niveau et de tes habitudes alimentaires.</p></div>
+        <div class="step glass"><h3>Formule</h3><p>On associe la bonne nutrition au bon programme, sans superflu.</p></div>
+        <div class="step glass"><h3>Performance</h3><p>On mesure tes progrès et on ajuste, séance après séance.</p></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="section-head"><span class="eyebrow">Les essentiels du labo</span><h2>Ce qu'on recommande d'abord.</h2></div>
+      <div class="products" id="featured"></div>
+    </div>
+
+    <div class="cta"><h2>Prêt à entrer au labo ?</h2><p>Dis-nous ton objectif. On te propose la nutrition et le programme qui vont avec.</p><a class="btn light" href="#contact">Parler à un coach</a></div>
+  </section>
+
+  <!-- NUTRITION -->
+  <section class="page" id="nutrition" aria-label="Nutrition">
+    <div class="section-head"><span class="eyebrow rise">AZLabs Nutrition</span><h1 class="rise">Formulé comme au labo.</h1><p class="rise">Chaque produit est choisi pour sa composition, pas pour son emballage. Filtre selon ton objectif.</p></div>
+    <div class="block" style="gap:22px">
+      <div class="filters" id="filters" role="group" aria-label="Filtrer par objectif"></div>
+      <div class="products" id="catalog"></div>
+    </div>
+    <div class="block">
+      <div class="section-head"><span class="eyebrow">Ton plan nutrition</span><h2>Simple, dosé, suivi.</h2></div>
+      <div class="steps">
+        <div class="step glass"><h3>Ton objectif</h3><p>Prise de muscle, sèche, santé ou sommeil : on part de ce que tu veux.</p></div>
+        <div class="step glass"><h3>Ton plan</h3><p>Un plan alimentaire simple, avec les compléments utiles et leur moment de prise.</p></div>
+        <div class="step glass"><h3>Ton suivi</h3><p>On ajuste après quelques semaines selon tes résultats.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAINING -->
+  <section class="page" id="training" aria-label="Training">
+    <div class="section-head"><span class="eyebrow green rise">AZLabs Training</span><h1 class="rise">Choisis ton protocole.</h1><p class="rise">Trois programmes, chacun avec ses séries, ses répétitions et son repos. Tout se mesure.</p></div>
+    <div class="programs">
+      <article class="program glass"><span class="letter">PROTOCOLE A</span><h3>Force</h3><p>Squat, développé couché, soulevé de terre : progresser sur les mouvements de base.</p>
+        <dl class="scheme"><dt>Séries</dt><dd>5 × 5</dd><dt>Charge</dt><dd>80–85 % du 1RM</dd><dt>Repos</dt><dd>3 min</dd><dt>Rythme</dt><dd>3 séances / semaine</dd></dl></article>
+      <article class="program glass"><span class="letter">PROTOCOLE B</span><h3>Hypertrophie</h3><p>Volume, tempo et récupération pensés pour construire du muscle.</p>
+        <dl class="scheme"><dt>Séries</dt><dd>4 × 8–12</dd><dt>Charge</dt><dd>65–75 % du 1RM</dd><dt>Repos</dt><dd>90 s</dd><dt>Rythme</dt><dd>4 séances / semaine</dd></dl></article>
+      <article class="program glass"><span class="letter">PROTOCOLE C</span><h3>Remise en forme</h3><p>Reprendre de bonnes bases, en douceur et avec régularité.</p>
+        <dl class="scheme"><dt>Séries</dt><dd>3 × 12–15</dd><dt>Charge</dt><dd>50–60 % du 1RM</dd><dt>Repos</dt><dd>60 s</dd><dt>Rythme</dt><dd>3 séances / semaine</dd></dl></article>
+    </div>
+
+    <div class="block">
+      <div class="section-head"><span class="eyebrow green">Outil du labo</span><h2>Calcule ton 1RM.</h2><p>Ton 1RM est la charge maximale que tu peux soulever une fois. Il fixe les charges de chaque protocole.</p></div>
+      <div class="calc glass">
+        <form class="calc-in" id="calc" novalidate>
+          <label class="field" for="lift">Exercice
+            <select id="lift"><option>Squat</option><option>Développé couché</option><option>Soulevé de terre</option><option>Développé militaire</option></select>
+          </label>
+          <label class="field" for="weight">Charge soulevée (kg)
+            <input id="weight" type="number" inputmode="decimal" min="1" max="500" step="0.5" value="80">
+          </label>
+          <label class="field" for="reps">Répétitions réussies
+            <input id="reps" type="number" inputmode="numeric" min="1" max="12" step="1" value="6">
+          </label>
+        </form>
+        <div class="calc-out" aria-live="polite">
+          <span class="eyebrow" style="color:#00D9FF" id="calc-lift">Squat · 1RM estimé</span>
+          <div class="big num" id="orm">—</div>
+          <div class="zones" id="zones"></div>
+          <p class="note">Formule d'Epley : charge × (1 + répétitions ÷ 30). Fiable jusqu'à 10 répétitions environ. C'est une estimation, pas un test maximal.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- METHODE -->
+  <section class="page" id="methode" aria-label="Méthode">
+    <div class="section-head"><span class="eyebrow rise">La méthode AZLabs</span><h1 class="rise">La science posée sur la force.</h1><p class="rise">AZLabs traite ton corps comme un projet de laboratoire : on observe, on teste, on mesure.</p></div>
+    <div class="values">
+      <div class="value glass"><span class="chip" style="background:var(--lab-soft);color:var(--lab-ink)">A</span><h3>La fiole</h3><p>La nutrition, formulée avec la rigueur d'un laboratoire : des doses claires et des produits utiles.</p></div>
+      <div class="value glass"><span class="chip" style="background:var(--force-soft);color:var(--force-ink)">Z</span><h3>Les bulles</h3><p>L'énergie qui monte à chaque séance : la force reste la base de tout programme.</p></div>
+      <div class="value glass"><span class="chip" style="background:var(--navy);color:var(--white)">AZ</span><h3>Le sourire</h3><p>Progresser se mesure, et ça doit rester un plaisir : chaque séance compte.</p></div>
+    </div>
+    <div class="block">
+      <div class="section-head"><span class="eyebrow">Le protocole</span><h2>Comment on travaille.</h2></div>
+      <div class="steps">
+        <div class="step glass"><h3>Analyse</h3><p>Un échange sur ton objectif, ton niveau, ton emploi du temps et ce que tu manges aujourd'hui.</p></div>
+        <div class="step glass"><h3>Formule</h3><p>Un protocole d'entraînement et une nutrition adaptée, avec seulement les compléments utiles.</p></div>
+        <div class="step glass"><h3>Performance</h3><p>Des charges notées à chaque séance et des ajustements quand la progression ralentit.</p></div>
+      </div>
+    </div>
+    <div class="cta"><h2>On commence par ton objectif.</h2><p>Écris-nous en deux lignes ce que tu veux atteindre.</p><a class="btn light" href="#contact">Écrire au labo</a></div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="page" id="contact" aria-label="Contact">
+    <div class="section-head"><span class="eyebrow rise">Contact</span><h1 class="rise">Rejoindre le labo.</h1><p class="rise">Décris ton objectif. Ton message est préparé ici, puis tu l'envoies sur Instagram ou par SMS.</p></div>
+    <div class="contact">
+      <form class="glass" id="contact-form" novalidate>
+        <label class="field" for="c-name">Prénom<input id="c-name" maxlength="60" autocomplete="given-name"></label>
+        <label class="field" for="c-goal">Objectif
+          <select id="c-goal"><option>Prise de muscle</option><option>Sèche</option><option>Force</option><option>Remise en forme</option><option>Conseil compléments</option></select>
+        </label>
+        <label class="field" for="c-msg">Ton message<textarea id="c-msg" rows="4" maxlength="600" placeholder="Ex. : 3 séances par semaine, je veux prendre 4 kg de muscle."></textarea></label>
+        <button class="btn dark fit" type="submit">Copier mon message</button>
+        <p class="status" id="c-status" role="status"></p>
+      </form>
+      <div class="info glass">
+        <div class="line"><span>Instagram</span><b>[INSTAGRAM]</b></div>
+        <div class="line"><span>Téléphone</span><b>[TÉLÉPHONE]</b></div>
+        <div class="line"><span>Adresse</span><b>[ADRESSE]</b></div>
+        <div class="line"><span>Pôles</span><b><span style="color:var(--lab)">Nutrition</span> · <span style="color:var(--force-ink)">Training</span></b></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <a class="brand" href="#accueil" aria-label="AZLabs, accueil"><svg class="az-mark" aria-hidden="true"><use href="#az-mark"/></svg><svg class="az-word" aria-hidden="true"><use href="#az-word"/></svg></a>
+  <span>Nutrition · Training</span>
+  <span>© 2026 AZLabs</span>
+</footer>
+
+<script>
+// Brand symbol (the flask that smiles) lives once in the #az-mark sprite; every logo is a <use>.
+const orb = document.getElementById('orb');
+orb.insertAdjacentHTML('afterbegin', '<svg class="az-mark" role="img" aria-label="Symbole AZLabs"><use href="#az-mark"/></svg>');
+
+// Hero: the Nutrition / Training switch recolours the symbol and changes the call to action.
+const MODES = {
+  nut: { color: 'url(#az-grad)', note: 'Nutrition d’abord : compléments dosés et plans alimentaires selon ton objectif.', cta: 'Explorer la nutrition', href: '#nutrition' },
+  train: { color: '#00D9FF', note: 'Training d’abord : programmes de force mesurés, séance après séance.', cta: 'Voir les programmes', href: '#training' },
+};
+const hero = document.getElementById('hero');
+function setMode(mode) {
+  const m = MODES[mode];
+  hero.dataset.mode = mode;
+  hero.querySelectorAll('.switch button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+  orb.querySelector('.az-mark').style.fill = m.color;
+  document.getElementById('mode-note').textContent = m.note;
+  const cta = document.getElementById('mode-cta');
+  cta.textContent = m.cta;
+  cta.href = m.href;
+}
+hero.querySelectorAll('.switch button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+setMode('nut');
+
+// Catalogue: products AZLabs stocks. Prices are set by the shop, so each card asks for them.
+const PRODUCTS = [
+  { name: 'Créatine monohydrate', kind: 'Force', goals: ['muscle', 'force'], text: 'Le classique des athlètes de force, en poudre pure et micronisée.', spec: ['Poudre 1 kg', '500 g', '3–5 g / jour'], featured: true },
+  { name: 'Magnésium bisglycinate', kind: 'Récupération', goals: ['recup', 'sommeil'], text: 'Une forme de magnésium bien tolérée, pour les sportifs qui s’entraînent souvent.', spec: ['Gélules', 'Le soir'], featured: true },
+  { name: 'Vitamine D3 + K2', kind: 'Santé', goals: ['sante'], text: 'Le duo D3 et K2 (MK-7) pour les mois où le soleil manque.', spec: ['D3 4000 UI', 'Comprimés'], featured: true },
+  { name: 'Zinc picolinate', kind: 'Santé', goals: ['sante', 'recup'], text: 'Un minéral souvent bas chez les sportifs qui transpirent beaucoup.', spec: ['150 comprimés'] },
+  { name: 'Bisglycinate de zinc', kind: 'Santé', goals: ['sante'], text: 'Une autre forme de zinc, douce pour l’estomac.', spec: ['Gélules'] },
+  { name: 'Bisglycinate de fer', kind: 'Santé', goals: ['sante'], text: 'Du fer sous une forme bien assimilée, à prendre sur conseil.', spec: ['Gélules'] },
+  { name: 'Oméga 3', kind: 'Santé', goals: ['sante', 'recup'], text: 'Des capsules faciles à avaler pour l’apport en acides gras.', spec: ['3 × 90 capsules'] },
+  { name: 'Citrulline malate', kind: 'Performance', goals: ['force', 'muscle'], text: 'Avant l’entraînement, pour les séances longues et intenses.', spec: ['Poudre 360 g'] },
+  { name: 'Pré-workout', kind: 'Performance', goals: ['force'], text: 'Un mélange à prendre avant la séance pour l’énergie et la concentration.', spec: ['Poudre 240 g'] },
+  { name: 'Électrolytes sans sucre', kind: 'Performance', goals: ['recup'], text: 'Pour boire pendant l’effort quand il fait chaud.', spec: ['Poudre 270 g', '0 sucre'] },
+  { name: 'Taurine', kind: 'Performance', goals: ['force'], text: 'Un acide aminé en poudre, simple à doser.', spec: ['Poudre 300 g'] },
+  { name: 'Mélatonine Keep Sleep', kind: 'Sommeil', goals: ['sommeil'], text: 'Pour retrouver un rythme de sommeil régulier.', spec: ['300 comprimés'] },
+];
+const GOALS = [['all', 'Tout'], ['muscle', 'Prise de muscle'], ['force', 'Force'], ['recup', 'Récupération'], ['sante', 'Santé'], ['sommeil', 'Sommeil']];
+const VIAL = '<svg class="az-mark" aria-hidden="true"><use href="#az-mark"/></svg>';
+const card = (p) => `<article class="product glass">
+  <div class="vial">${VIAL}</div>
+  <span class="kind">${p.kind}</span><h3>${p.name}</h3><p>${p.text}</p>
+  <div class="spec">${p.spec.map((s) => `<span>${s}</span>`).join('')}</div>
+  <div class="foot"><span class="price">Prix sur demande</span><a class="ask" href="#contact" data-product="${p.name}">Demander</a></div>
+</article>`;
+document.getElementById('featured').innerHTML = PRODUCTS.filter((p) => p.featured).map(card).join('');
+const filters = document.getElementById('filters');
+filters.innerHTML = GOALS.map(([k, l]) => `<button type="button" data-goal="${k}" aria-pressed="${k === 'all'}">${l}</button>`).join('');
+function showGoal(goal) {
+  filters.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.goal === goal)));
+  document.getElementById('catalog').innerHTML = PRODUCTS.filter((p) => goal === 'all' || p.goals.includes(goal)).map(card).join('');
+}
+filters.addEventListener('click', (e) => { const g = e.target.closest('[data-goal]'); if (g) showGoal(g.dataset.goal); });
+showGoal('all');
+
+// "Demander" pre-fills the contact message with the product.
+document.addEventListener('click', (e) => {
+  const p = e.target.closest('[data-product]');
+  if (!p) return;
+  document.getElementById('c-goal').value = 'Conseil compléments';
+  document.getElementById('c-msg').value = `Bonjour, je voudrais le prix et le conseil d'utilisation pour : ${p.dataset.product}.`;
+});
+
+// 1RM calculator (Epley) and the load for each protocol, rounded to 2.5 kg plates.
+const ZONES = [['Force', .825], ['Hypertrophie', .70], ['Remise en forme', .55]];
+const oneRM = (weight, reps) => (reps === 1 ? weight : weight * (1 + reps / 30));
+console.assert(Math.round(oneRM(80, 6)) === 96 && oneRM(100, 1) === 100, 'Epley 1RM');
+function updateCalc() {
+  const w = Number(document.getElementById('weight').value);
+  const r = Number(document.getElementById('reps').value);
+  document.getElementById('calc-lift').textContent = `${document.getElementById('lift').value} · 1RM estimé`;
+  if (!(w > 0 && w <= 500 && Number.isInteger(r) && r >= 1 && r <= 12)) {
+    document.getElementById('orm').innerHTML = '<small>Entre une charge et 1 à 12 répétitions.</small>';
+    document.getElementById('zones').innerHTML = '';
+    return;
+  }
+  const rm = oneRM(w, r);
+  document.getElementById('orm').innerHTML = `${(Math.round(rm * 2) / 2).toLocaleString('fr-FR')} <small>kg</small>`;
+  document.getElementById('zones').innerHTML = ZONES.map(([n, pct]) =>
+    `<div class="zone"><span>${n}</span><span class="track"><span class="fill" style="width:${pct * 100}%"></span></span><b class="num">${(Math.round(rm * pct / 2.5) * 2.5).toLocaleString('fr-FR')} kg</b></div>`).join('');
+}
+document.getElementById('calc').addEventListener('input', updateCalc);
+updateCalc();
+
+// Contact: no backend, so the message is copied for Instagram or a text.
+document.getElementById('contact-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('c-name');
+  const status = document.getElementById('c-status');
+  if (!name.value.trim()) { status.textContent = 'Indique ton prénom pour préparer le message.'; name.focus(); return; }
+  const text = `AZLabs — ${document.getElementById('c-goal').value}\nPrénom : ${name.value.trim()}\n${document.getElementById('c-msg').value.trim()}`;
+  try {
+    await navigator.clipboard.writeText(text);
+    status.textContent = 'Message copié. Colle-le dans un message Instagram ou un SMS.';
+  } catch {
+    const box = document.getElementById('c-msg');
+    box.value = text;
+    box.select();
+    status.textContent = 'Copie automatique impossible : le message est sélectionné, copie-le avec Ctrl + C.';
+  }
+});
+
+// Pages: one per hash (#nutrition, #training…), #accueil by default.
+const PAGES = ['accueil', 'nutrition', 'training', 'methode', 'contact'];
+const links = document.getElementById('links');
+const menuBtn = document.getElementById('menu-btn');
+function route() {
+  const page = PAGES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'accueil';
+  PAGES.forEach((p) => document.getElementById(p).classList.toggle('on', p === page));
+  links.querySelectorAll('a').forEach((a) => (a.getAttribute('href') === '#' + page ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current')));
+  links.classList.remove('open');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  window.scrollTo({ top: 0 });
+}
+window.addEventListener('hashchange', route);
+menuBtn.addEventListener('click', () => menuBtn.setAttribute('aria-expanded', String(links.classList.toggle('open'))));
+route();
+</script>
