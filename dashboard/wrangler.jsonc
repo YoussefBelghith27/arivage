@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "arivage-stock",
+  "main": "server/worker.js",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+  // The Vite build. /api/* goes to the Worker; any other unknown path gets index.html.
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "durable_objects": {
+    "bindings": [{ "name": "DB", "class_name": "Database" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Database"] }],
+  // Secrets (ADMIN_PASSWORD, RESELLER_PASSWORD, GOOGLE_CLIENT_ID) are set with `wrangler secret put`, never here.
+  // Wrangler inlines process.env.NODE_ENV at build time ("development" under wrangler dev): always production here
+  // (Secure cookie, HSTS, trust proxy), also locally.
+  "define": { "process.env.NODE_ENV": "\"production\"" },
+  "observability": { "enabled": true }
+}

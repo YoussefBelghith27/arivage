@@ -1,10 +1,11 @@
-import { DatabaseSync } from 'node:sqlite';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { SEED } from './seed.js';
+import { HttpError } from './store.js';
 
 export function tx(db, fn) {
+  if (db.transactionSync) return db.transactionSync(fn); // Durable Object storage (see do-db.js): BEGIN is refused there
   db.exec('BEGIN');
   try {
     const result = fn();
@@ -25,7 +26,15 @@ const RESELLER_PRICES = `CREATE TABLE IF NOT EXISTS reseller_prices (
 
 export function openDb(file = process.env.DB_PATH || fileURLToPath(new URL('./data/stock.db', import.meta.url))) {
   if (file !== ':memory:') mkdirSync(dirname(file), { recursive: true });
+  // Loaded at call time: node:sqlite does not exist on Workers, which use migrate() on the Durable Object's SQLite.
+  const { DatabaseSync } = process.getBuiltinModule('node:sqlite');
   const db = new DatabaseSync(file);
+  db.exec('PRAGMA foreign_keys = ON; PRAGMA journal_mode = WAL;');
+  return migrate(db);
+}
+
+// Schema, idempotent upgrades and first-start seed, on node:sqlite or on the Durable Object adapter.
+export function migrate(db) {
   const hasColumn = (table, name) => db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === name);
   // An early, never-used reseller_sales (no external_id) is replaced; refuse if it ever held data.
   const old = db.prepare("SELECT 1 FROM sqlite_master WHERE name = 'reseller_sales'").get()
@@ -35,8 +44,6 @@ export function openDb(file = process.env.DB_PATH || fileURLToPath(new URL('./da
     db.exec('DROP TABLE reseller_sales');
   }
   db.exec(`
-    PRAGMA foreign_keys = ON;
-    PRAGMA journal_mode = WAL;
     CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value REAL NOT NULL);
     CREATE TABLE IF NOT EXISTS articles (
       id INTEGER PRIMARY KEY,
@@ -165,4 +172,32 @@ export function openDb(file = process.env.DB_PATH || fileURLToPath(new URL('./da
       insert.run(name, supplier, category, Math.round((total / qty) * 100) / 100, qty)));
   }
   return db;
+}
+
+// One-off move of the local data to the cloud: every table but sessions, parents before children.
+export const DUMP_TABLES = ['settings', 'users', 'articles', 'sales', 'reseller_prices', 'external_items', 'external_purchases', 'reseller_sales'];
+export const dumpDb = (db) => Object.fromEntries(DUMP_TABLES.map((t) => [t, db.prepare(`SELECT * FROM ${t}`).all()]));
+
+// Replaces the data of a database nobody has used yet (only the first-start seed and the two accounts), once.
+// Users come with their password hashes, so the local passwords work afterwards; open sessions are closed.
+export function importDump(db, dump) {
+  return tx(db, () => {
+    db.exec('CREATE TABLE IF NOT EXISTS imported (at TEXT NOT NULL)');
+    const used = db.prepare(`SELECT (SELECT COUNT(*) FROM imported) + (SELECT COUNT(*) FROM sales) + (SELECT COUNT(*) FROM reseller_sales)
+      + (SELECT COUNT(*) FROM external_items) + (SELECT COUNT(*) FROM reseller_prices) + MAX((SELECT COUNT(*) FROM users) - 2, 0) AS n`).get().n;
+    if (used) throw new HttpError(409, 'Import refusé : la base est déjà utilisée (ou déjà importée)');
+    for (const t of ['sessions', ...DUMP_TABLES].reverse()) db.exec(`DELETE FROM ${t}`);
+    const counts = {};
+    for (const t of DUMP_TABLES) {
+      const columns = new Set(db.prepare(`PRAGMA table_info(${t})`).all().map((c) => c.name));
+      for (const row of dump[t]) {
+        const keys = Object.keys(row);
+        if (!keys.length || keys.some((k) => !columns.has(k))) throw new HttpError(400, `Colonnes inconnues dans ${t}`);
+        db.prepare(`INSERT INTO ${t} (${keys.join(', ')}) VALUES (${keys.map(() => '?').join(', ')})`).run(...Object.values(row));
+      }
+      counts[t] = dump[t].length;
+    }
+    db.prepare("INSERT INTO imported VALUES (datetime('now'))").run();
+    return counts;
+  });
 }

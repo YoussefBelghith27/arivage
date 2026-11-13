@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { z, ZodError } from 'zod';
 import { OAuth2Client } from 'google-auth-library';
-import { openDb } from './db.js';
+import { openDb, importDump, DUMP_TABLES } from './db.js';
 import * as store from './store.js';
 import * as reseller from './reseller.js';
 import * as auth from './auth.js';
@@ -13,16 +13,11 @@ const PROD = process.env.NODE_ENV === 'production';
 const PORT = Number(process.env.PORT) || 3001;
 // Locally only this PC can connect; in production the host's proxy (HTTPS) sits in front.
 const HOST = process.env.HOST || (PROD ? '0.0.0.0' : '127.0.0.1');
-const db = openDb();
+// The database: node:sqlite when run with Node (below, and in tests), the Durable Object's on Workers (worker.js).
+let db;
 // "Se connecter avec Google" is on only when a Google OAuth Client ID is configured.
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || null;
 const google = GOOGLE_CLIENT_ID && new OAuth2Client(GOOGLE_CLIENT_ID);
-try {
-  auth.ensureUsers(db, process.env);
-} catch (e) {
-  console.error(e.message);
-  process.exit(1);
-}
 
 const id = z.coerce.number().int().positive();
 const text = (max) => z.string().trim().max(max).default('');
@@ -96,6 +91,7 @@ app.use(helmet({
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   ...(PROD ? {} : { strictTransportSecurity: false }),
 }));
+app.use('/api/import', express.json({ limit: '20mb' })); // the one-off data import; parsed once, the next parser skips it
 app.use(express.json({ limit: '10kb' }));
 
 // Writes must come from this site's own pages (the session cookie is also SameSite=Strict).
@@ -207,10 +203,16 @@ a.get('/resellers/:id/follow', handle((req) => {
   if (!auth.listResellers(db).some((u) => u.id === rid)) throw new store.HttpError(404, 'Revendeur introuvable');
   return { stats: reseller.getStats(db, rid), purchases: reseller.listPurchases(db, rid), sales: reseller.listSales(db, rid) };
 }));
+// One-off: the local database's data into a still unused cloud database (server/import-to-cloud.js).
+const cell = z.union([z.string(), z.number(), z.null()]);
+const dumpSchema = z.object(Object.fromEntries(DUMP_TABLES.map((t) => [t, z.array(z.record(z.string(), cell)).max(1e5)]))).strict();
+a.post('/import', handle((req) => importDump(db, dumpSchema.parse(req.body))));
 app.use('/api', a);
 
-const dist = fileURLToPath(new URL('../dist', import.meta.url));
-if (existsSync(dist)) {
+// Run by Node (a file URL). On Workers the bundle has none, and static assets serve dist/ (wrangler.jsonc).
+const NODE = import.meta.url?.startsWith('file:');
+const dist = NODE && fileURLToPath(new URL('../dist', import.meta.url));
+if (dist && existsSync(dist)) {
   app.use(express.static(dist));
   app.get('*', (req, res) => res.sendFile(`${dist}/index.html`));
 }
@@ -230,6 +232,19 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Erreur serveur' });
 });
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
+// Sets the database and creates the two accounts on first start (throws without their passwords).
+export function createApp(database) {
+  db = database;
+  auth.ensureUsers(db, process.env);
+  return app;
+}
+
+if (NODE && process.argv[1] === fileURLToPath(import.meta.url)) {
+  try {
+    createApp(openDb());
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
   app.listen(PORT, HOST, () => console.log(`API prête sur http://${HOST}:${PORT}`));
 }

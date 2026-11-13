@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 process.env.DB_PATH = ':memory:';
 process.env.ADMIN_PASSWORD = 'admin-pass-123';
 process.env.RESELLER_PASSWORD = 'aziz-pass-123';
-const { app } = await import('./index.js');
+const { createApp } = await import('./index.js');
+const { openDb } = await import('./db.js');
+const app = createApp(openDb(':memory:'));
 
 const server = app.listen(0);
 const base = `http://127.0.0.1:${server.address().port}/api`;

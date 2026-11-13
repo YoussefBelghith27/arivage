@@ -15,7 +15,8 @@ export function verifyPassword(password, stored) {
 }
 
 // Used when the username is unknown, so a wrong name takes as long as a wrong password.
-const DUMMY_HASH = hashPassword(randomBytes(16).toString('hex'));
+// Made on first use: Workers refuse random values at startup (global scope).
+let dummyHash;
 
 export function setPassword(db, username, password) {
   const { changes } = db.prepare('UPDATE users SET password_hash = ? WHERE username = ?').run(hashPassword(password), username);
@@ -49,7 +50,7 @@ export function createReseller(db, { name, username, password }) {
 // Returns { token, user, maxAge } or throws 401. The token goes in a cookie; only its hash is stored.
 export function login(db, username, password) {
   const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-  const ok = verifyPassword(password, user?.password_hash ?? DUMMY_HASH);
+  const ok = verifyPassword(password, user?.password_hash ?? (dummyHash ??= hashPassword(randomBytes(16).toString('hex'))));
   if (!user || !ok) throw new HttpError(401, 'Identifiant ou mot de passe incorrect');
   return createSession(db, user);
 }

@@ -4,3 +4,5 @@ server/data
 .env*
 !.env.example
 .taste-skill
+.wrangler
+.dev.vars*

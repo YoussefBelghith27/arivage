@@ -4,7 +4,10 @@ import { DatabaseSync } from 'node:sqlite';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { openDb } from './db.js';
+import { openDb, migrate, dumpDb, importDump, tx } from './db.js';
+import { doDb } from './do-db.js';
+import { ensureUsers, login } from './auth.js';
+import * as store from './store.js';
 import * as reseller from './reseller.js';
 
 // The schema as it was before several resellers (commit e8a6c8c): one implicit reseller, an external flag on admin sales.
@@ -84,4 +87,71 @@ test('an old single-reseller database is migrated to aziz, and migrating again c
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+const ENV = { ADMIN_PASSWORD: 'admin-pass-123', RESELLER_PASSWORD: 'aziz-pass-123' };
+
+test('import copies a local database (read only) into an unused one, once', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'arivage-'));
+  const file = join(dir, 'local.db');
+  try {
+    const local = openDb(file);
+    ensureUsers(local, { ADMIN_PASSWORD: 'local-admin-123', RESELLER_PASSWORD: 'local-aziz-123' });
+    const article = store.listArticles(local)[0];
+    store.createSale(local, { article_id: article.id, qty: 1, client: 'C', reseller_id: 2 });
+    local.close();
+
+    const source = new DatabaseSync(file, { readOnly: true });
+    assert.throws(() => source.exec('DELETE FROM sales')); // the script cannot change the local file
+    const dump = JSON.parse(JSON.stringify(dumpDb(source))); // as sent over HTTP
+    source.close();
+
+    const cloud = openDb(':memory:');
+    ensureUsers(cloud, ENV);
+    login(cloud, 'youssef', 'admin-pass-123'); // the admin's cloud session, closed by the import
+    const counts = importDump(cloud, dump);
+    assert.equal(counts.sales, 1);
+    assert.deepEqual(JSON.parse(JSON.stringify(dumpDb(cloud))), dump);
+    assert.equal(cloud.prepare('SELECT COUNT(*) AS n FROM sessions').get().n, 0);
+    assert.equal(login(cloud, 'youssef', 'local-admin-123').user.username, 'youssef'); // local passwords now
+    assert.throws(() => importDump(cloud, dump), { status: 409 }); // second run: refused, nothing changed
+
+    const fresh = openDb(':memory:');
+    ensureUsers(fresh, ENV);
+    assert.throws(() => importDump(fresh, { ...dump, articles: [{ id: 1, nope: 1 }] }), { status: 400 });
+    assert.equal(store.listArticles(fresh).length, 18); // rolled back
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// Stand-in for a Durable Object's ctx.storage over node:sqlite: exec() binds only `?`, BEGIN is refused.
+function fakeStorage() {
+  const db = new DatabaseSync(':memory:');
+  db.exec('PRAGMA foreign_keys = ON');
+  return {
+    sql: {
+      exec(q, ...args) {
+        if (/^\s*(BEGIN|COMMIT|ROLLBACK|SAVEPOINT)/i.test(q)) throw new Error('transaction statements refused');
+        if (/:\w/.test(q.replace(/'[^']*'/g, ''))) throw new Error('named parameter reached sql.exec');
+        const rows = args.length || /^\s*(SELECT|PRAGMA|WITH)|RETURNING/i.test(q) ? db.prepare(q).all(...args) : (db.exec(q), []);
+        return { toArray: () => rows, one: () => rows[0] };
+      },
+    },
+    transactionSync: (fn) => tx(db, fn),
+  };
+}
+
+test('the Durable Object adapter runs the same modules: named params, changes, rollback', () => {
+  const db = migrate(doDb(fakeStorage()));
+  ensureUsers(db, ENV);
+  const article = store.listArticles(db).find((a) => a.stock >= 2);
+  store.createSale(db, { article_id: article.id, qty: 2, client: '', reseller_id: 2 });
+  assert.equal(store.listArticles(db).find((a) => a.id === article.id).stock, article.stock - 2);
+  assert.throws(() => store.createSale(db, { article_id: article.id, qty: 1e5, client: '' }), { status: 409 });
+  assert.equal(reseller.listItems(db, 2)[0].stock, 2); // :rid
+  assert.equal(reseller.listItems(db, 3).length, 0);
+  assert.throws(() => reseller.deleteSale(db, 2, 999), { status: 404 }); // run().changes === 0
+  assert.throws(() => tx(db, () => { store.adjustStock(db, article.id, 1); throw new Error('boom'); }), /boom/);
+  assert.equal(store.listArticles(db).find((a) => a.id === article.id).stock, article.stock - 2); // rolled back
 });

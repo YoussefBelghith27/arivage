@@ -9,7 +9,10 @@
     "start": "node --env-file-if-exists=.env server/index.js",
     "test": "node --test \"server/*.test.js\"",
     "set-password": "node --env-file-if-exists=.env server/set-password.js",
-    "set-email": "node --env-file-if-exists=.env server/set-email.js"
+    "set-email": "node --env-file-if-exists=.env server/set-email.js",
+    "dev:cf": "vite build && wrangler dev",
+    "deploy": "vite build && wrangler deploy",
+    "import-to-cloud": "node server/import-to-cloud.js"
   },
   "dependencies": {
     "express": "^4.21.2",
@@ -22,9 +25,13 @@
     "concurrently": "^9.1.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "wrangler": "^4.162.0"
   },
   "engines": {
     "node": ">=22.9"
+  },
+  "overrides": {
+    "iconv-lite": "0.6.3"
   }
 }
